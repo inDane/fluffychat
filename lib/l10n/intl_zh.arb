@@ -2811,5 +2811,26 @@
                 "type": "String"
             }
         }
+    },
+    "accountsAndSettings": "账户和设置",
+    "@accountsAndSettings": {
+        "type": "String",
+        "placeholders": {}
+    },
+    "incomingCallFrom": "{user} 的来电",
+    "@incomingCallFrom": {
+        "placeholders": {
+            "user": {
+                "type": "String"
+            }
+        }
+    },
+    "serverRespondedWithError": "服务器回复了错误消息：{error}",
+    "@serverRespondedWithError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
     }
 }

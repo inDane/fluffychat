@@ -616,16 +616,14 @@ class ChatController extends State<ChatPageWithRoom>
     final setOnLatestEvent = eventId == null;
     eventId ??= timeline.events
         .firstWhereOrNull(
-          (event) => room.pushRuleState == PushRuleState.notify
-              ? room.client.pushruleEvaluator.match(event).notify
-              : {
-                      EventTypes.Message,
-                      EventTypes.Encrypted,
-                      EventTypes.Sticker,
-                    }.contains(event.type) &&
-                    event.eventId.isValidMatrixIdStrict(),
+          (event) => room.client.pushruleEvaluator.match(event).notify,
         )
         ?.eventId;
+
+    if (setOnLatestEvent && (room.hasNewMessages || room.isUnread)) {
+      eventId ??=
+          room.lastEvent?.eventId ?? timeline.events.firstOrNull?.eventId;
+    }
 
     // There is no event we could place a read marker
     if (eventId == null) return;
@@ -1272,6 +1270,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (emoji == null) return;
     final text = sendController.text;
     final selection = sendController.selection;
+    final start = selection.baseOffset == -1 ? 0 : selection.baseOffset;
     final newText = sendController.text.isEmpty
         ? emoji.emoji
         : text.replaceRange(selection.start, selection.end, emoji.emoji);
@@ -1279,7 +1278,7 @@ class ChatController extends State<ChatPageWithRoom>
       text: newText,
       selection: TextSelection.collapsed(
         // don't forget an UTF-8 combined emoji might have a length > 1
-        offset: selection.baseOffset + emoji.emoji.length,
+        offset: start + emoji.emoji.length,
       ),
     );
   }
